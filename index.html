@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบฟอร์มใบเบิกแบบพิมพ์ - ไปรษณีย์กลาง</title>
+    <!-- Google Fonts: Sarabun -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #E1251B; /* THP Red */
+            --primary-dark: #B91C14;
+            --text-color: #333333;
+            --bg-color: #F8F9FA;
+            --border-color: #AAAAAA; /* Darker border for better print visibility */
+            --light-border: #E5E7EB;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Controls Section (Non-printable) */
+        .controls-container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 8px;
+            padding: 10px 20px;
+            margin-bottom: 10px;
+            box-shadow: var(--card-shadow);
+            border-left: 5px solid var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .controls-title {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1F2937;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        button.btn-secondary {
+            background-color: #4B5563;
+        }
+        button.btn-secondary:hover {
+            background-color: #374151;
+        }
+
+        button.btn-success {
+            background-color: #10B981;
+        }
+        button.btn-success:hover {
+            background-color: #059669;
+        }
+
+        /* Printable Form Page Setup */
+        .form-page {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 4mm 6mm;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Style */
+        .form-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-text h1 {
+            font-size: 1.25rem;
+            margin: 0;
+            color: #1F2937;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .logo-text p {
+            font-size: 0.75rem;
+            margin: 0;
+            color: #6B7280;
+        }
+
+        .form-title {
+            text-align: right;
+        }
+        .form-title h2 {
+            font-size: 1.2rem;
+            margin: 0;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .sheet-number {
+            font-size: 0.8rem;
+            color: #374151;
+            margin-top: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            justify-content: flex-end;
+            width: 100%;
+        }
+        .sheet-val, .sheet-year {
+            border-bottom: 1px dotted #888888;
+            min-width: 25px;
+            text-align: center;
+            outline: none;
+            padding: 0 2px;
+            font-weight: 600;
+        }
+        .sheet-val:focus, .sheet-year:focus {
+            border-bottom: 1px solid var(--primary-color);
+            background-color: #FEF2F2;
+        }
+
+        /* Requester Information */
+        .meta-grid {
+            margin-bottom: 8px;
+        }
+        .meta-field {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .meta-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #374151;
+        }
+        .meta-value {
+            border-bottom: 1px dotted #888888;
+            flex-grow: 1;
+            padding: 1px 5px;
+            font-size: 0.85rem;
+            outline: none;
+            min-height: 20px;
+        }
+        .meta-value:focus {
+            border-bottom: 1px solid var(--primary-color);
+            background-color: #FEF2F2;
+        }
+
+        /* Table Style (Handwriting Friendly) */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 5px;
+        }
+
+        .items-table th {
+            background-color: #F3F4F6;
+            border: 1px solid var(--border-color);
+            padding: 5px 2px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #374151;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .items-table td {
+            border: 1px solid var(--border-color);
+            padding: 3px 3px;
+            font-size: 0.8rem;
+            vertical-align: middle;
+            height: 30px; /* Comfortable height for handwriting, optimized for A4 */
+        }
+
+        /* Optimized Column Widths */
+        .col-seq { width: 5%; text-align: center; }
+        .col-date { width: 10%; text-align: center; }
+        .col-yellow { width: 8%; text-align: center; }
+        .col-blue { width: 8%; text-align: center; }
+        .col-qty-req { width: 8%; text-align: center; }
+        .col-row-unit { width: 6%; text-align: center; }
+        .col-block-unit { width: 6%; text-align: center; }
+        .col-company { width: 18%; }
+        .col-requester-sig { width: 14%; }
+        .col-note { width: 14%; }
+        .col-action { width: 3%; text-align: center; }
+
+        .items-table input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+            vertical-align: middle;
+        }
+
+        .cell-editable {
+            outline: none;
+            min-height: 18px;
+        }
+        .cell-editable:focus {
+            background-color: #FEF2F2;
+        }
+
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .font-bold { font-weight: bold; }
+
+        /* Total Row Styling */
+        .total-label-cell {
+            text-align: right;
+            border: none !important;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        .total-box-cell {
+            border: 1px solid var(--border-color) !important;
+            background-color: #F9FAFB;
+        }
+        .total-empty-cell {
+            border: none !important;
+        }
+
+        /* Delete row button style */
+        .btn-delete {
+            background: none;
+            border: none;
+            color: #EF4444;
+            cursor: pointer;
+            padding: 0px 2px;
+            font-size: 0.9rem;
+            line-height: 1;
+            border-radius: 4px;
+        }
+        .btn-delete:hover {
+            background-color: #FEE2E2;
+            color: #DC2626;
+        }
+
+        /* Tooltip style instruction */
+        .instruction-box {
+            max-width: 900px;
+            width: 100%;
+            background-color: #EFF6FF;
+            border-left: 5px solid #3B82F6;
+            color: #1E40AF;
+            padding: 8px 15px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+            body {
+                background-color: white;
+                padding: 0;
+                margin: 0;
+            }
+
+            .controls-container, .instruction-box, .col-action, .btn-delete, #btnAddRow {
+                display: none !important;
+            }
+
+            .form-page {
+                box-shadow: none;
+                padding: 4mm 6mm;
+                width: 100%;
+                min-height: auto;
+            }
+
+            /* Make background colors in print mode print accurately if selected */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* If signature cell is empty when printing, show dotted line */
+            .cell-sig-print:empty::before {
+                content: ".....................";
+                color: #888888;
+                font-size: 0.75rem;
+                display: block;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Instruction Info Box (Non-printable) -->
+    <div class="instruction-box">
+        💡 <strong>คำแนะนำ:</strong> คอลัมน์ถูกปรับให้เหลือเฉพาะคอลัมน์ที่จำเป็นและขยายช่องว่างให้เขียนได้สะดวก สามารถพิมพ์ข้อมูลหรือสั่งพิมพ์เพื่อเขียนด้วยลายมือได้พอดี
+    </div>
+
+    <!-- Toolbar Controls (Non-printable) -->
+    <div class="controls-container">
+        <h3 class="controls-title">เครื่องมือจัดการแบบฟอร์มใบเบิกแบบพิมพ์</h3>
+        <div class="btn-group">
+            <button onclick="clearForm()" class="btn-secondary">🧹 ล้างข้อมูลทั้งหมด</button>
+            <button onclick="window.print()">🖨️ พิมพ์ฟอร์ม (Print)</button>
+        </div>
+    </div>
+
+    <!-- Main Form Page -->
+    <div class="form-page">
+        <!-- Logo and Header -->
+        <div class="form-header">
+            <div class="logo-area">
+                <div class="logo-text">
+                    <h1>ไปรษณีย์กลาง</h1>
+                    <p>General Post Office (GPO)</p>
+                </div>
+            </div>
+            <div class="form-title">
+                <h2>ใบเบิกแบบพิมพ์</h2>
+                <div class="sheet-number">
+                    แผ่นที่ <span class="sheet-val" contenteditable="true"></span> / <span class="sheet-year" contenteditable="true">2569</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Requester Information -->
+        <div class="meta-grid">
+            <div class="meta-field">
+                <span class="meta-label">แผนก:</span>
+                <div class="meta-value" contenteditable="true" style="border-bottom: none; font-weight: 500;">ลธ.</div>
+            </div>
+        </div>
+
+        <!-- Requisition Table -->
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th class="col-seq">ลำดับ</th>
+                    <th class="col-date">วันที่ขอเบิก</th>
+                    <th class="col-yellow">ป.133 ก.<br>(เหลือง)</th>
+                    <th class="col-blue">ป.133 ข.<br>(ฟ้า)</th>
+                    <th class="col-qty-req">จำนวนขอเบิก</th>
+                    <th class="col-row-unit">แถว</th>
+                    <th class="col-block-unit">ก้อน</th>
+                    <th class="col-company">ชื่อบริษัท</th>
+                    <th class="col-requester-sig">ลายมือชื่อ<br>(ผู้ขอเบิก)</th>
+                    <th class="col-note">หมายเหตุ</th>
+                    <th class="col-action"></th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Populate initial 30 compact rows
+        document.addEventListener("DOMContentLoaded", () => {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            for (let i = 1; i <= 30; i++) {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td class="col-seq text-center">${i}</td>
+                    <td class="col-date"><div class="cell-editable text-center" contenteditable="true"></div></td>
+                    <td class="col-yellow text-center"><input type="checkbox"></td>
+                    <td class="col-blue text-center"><input type="checkbox"></td>
+                    <td class="col-qty-req"><div class="cell-editable text-center" contenteditable="true"></div></td>
+                    <td class="col-row-unit text-center"><input type="checkbox"></td>
+                    <td class="col-block-unit text-center"><input type="checkbox"></td>
+                    <td class="col-company"><div class="cell-editable" contenteditable="true"></div></td>
+                    <td class="col-requester-sig"><div class="cell-editable cell-sig-print text-center" contenteditable="true"></div></td>
+                    <td class="col-note"><div class="cell-editable" contenteditable="true"></div></td>
+                    <td class="col-action"><button class="btn-delete" onclick="deleteRow(this)">×</button></td>
+                `;
+                tbody.appendChild(newRow);
+            }
+        });
+
+        // Function to re-index sequence numbers
+        function reindexTable() {
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach((row, index) => {
+                row.querySelector('.col-seq').textContent = index + 1;
+            });
+        }
+
+        // Add a new row to the table
+        function addRow() {
+            const tbody = document.getElementById('tableBody');
+            const newRow = document.createElement('tr');
+            
+            newRow.innerHTML = `
+                <td class="col-seq text-center"></td>
+                <td class="col-date"><div class="cell-editable text-center" contenteditable="true"></div></td>
+                <td class="col-yellow text-center"><input type="checkbox"></td>
+                <td class="col-blue text-center"><input type="checkbox"></td>
+                <td class="col-qty-req"><div class="cell-editable text-center" contenteditable="true"></div></td>
+                <td class="col-row-unit text-center"><input type="checkbox"></td>
+                <td class="col-block-unit text-center"><input type="checkbox"></td>
+                <td class="col-company"><div class="cell-editable" contenteditable="true"></div></td>
+                <td class="col-requester-sig"><div class="cell-editable cell-sig-print text-center" contenteditable="true"></div></td>
+                <td class="col-note"><div class="cell-editable" contenteditable="true"></div></td>
+                <td class="col-action"><button class="btn-delete" onclick="deleteRow(this)">×</button></td>
+            `;
+            
+            tbody.appendChild(newRow);
+            reindexTable();
+        }
+
+        // Delete a row from the table
+        function deleteRow(button) {
+            const row = button.closest('tr');
+            row.remove();
+            reindexTable();
+        }
+
+        // Clear all input/editable fields in the form
+        function clearForm() {
+            // Clear table cells
+            const cellEditables = document.querySelectorAll('.cell-editable');
+            cellEditables.forEach(cell => cell.textContent = '');
+
+            // Uncheck checkboxes
+            const checkboxes = document.querySelectorAll('.items-table input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+
+            // Clear sheet value
+            document.querySelector('.sheet-val').textContent = '';
+        }
+    </script>
+</body>
+</html>
